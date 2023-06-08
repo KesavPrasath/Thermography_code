@@ -40,7 +40,7 @@ plot(e,T_diff,'r-o','LineWidth',1);             % Plot emissivity vs. Temperatur
 xlabel('Emissivity of thermocouple');           % Gives a x-lable to the graph
 ylabel('Temperature difference [K]');           % Gives a y-lable to the graph
 grid on
-title('Delta T vs emissivity');
+title('∆T vs emissivity'); 
 
 function[Nu,alpha,Temp_air]=ode_1(sigma,Re,Pr,h,d1,Temp_tc,e,Temp_wall)
                               
