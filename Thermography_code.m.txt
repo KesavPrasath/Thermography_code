@@ -1,0 +1,51 @@
+clear;
+clc;
+close all;
+
+% Fluid Properties of Air at 186.7 degree_C
+rho = 0.759;                                    % Density in kg/m3
+cp_air = 1024;                                  % Spcific heat in J/kg.K
+vis_kin = 33.68*10^-6;                          % Kinematic viscocity in m2/s
+vis_dynamic = vis_kin*rho;                      % Dynamic viscocity of air in kg/m.s
+h = 0.03709;                                    % Thermal conductivity in W/m.K
+sigma = 5.67*10^-8;
+% given data
+Q_dot= 5.33*10^-3;
+d1 = 0.003;                                     % Thick thermocouple thickness in m 
+d2 = 0.0015;                                    % Thin thermocouple thickness in m 
+d_out = 0.054;                                    % Pipe outer diameter in m 
+t = 0.002;                                      % Pipe wall thickness in m 
+d_in = d_out-2*t;
+A_i = (pi/4)*d_in^2; 
+v = Q_dot/A_i;                                  % Air velocity in m/s 
+Re = v*d_in/vis_kin;                                 % Reynolds number 
+Pr = (cp_air*vis_dynamic)/h;                         % Prandtl number
+                           
+
+% Quasi Steady-state temperature 
+Temp_tc = 459.85;                                   % Air temperature in K
+Temp_wall = 368.45;                                   % Wall temperature in K 
+
+for i = 2:11
+    e(i)=(i-1)*0.05;
+    [~,~,Temp_air(i)]=ode_1(sigma,Re,Pr,h,d1,Temp_tc,e(i),Temp_wall);
+    T_diff(i) = Temp_air(i) - Temp_tc;                  % Temperature difference between the actual air temperature and the thermocouple temperature.
+end
+disp('     e      Temp_air     T_diff')
+disp([e' Temp_air' T_diff'])
+
+% Plot showing the dependence of the temperature difference on the emissivity.
+figure(1)
+plot(e,T_diff,'r-o','LineWidth',1);             % Plot emissivity vs. Temperature difference graph                                     
+xlabel('Emissivity of thermocouple');           % Gives a x-lable to the graph
+ylabel('Temperature difference [K]');           % Gives a y-lable to the graph
+grid on
+title('Delta T vs emissivity');
+
+function[Nu,alpha,Temp_air]=ode_1(sigma,Re,Pr,h,d1,Temp_tc,e,Temp_wall)
+                              
+Nu = 0.023*(Re^0.8)*(Pr^0.4);                   % Nussult number
+alpha = Nu*h/d1;                                % Heat transfer co-efficient in W/m2.K
+
+Temp_air = Temp_tc + (e*sigma*((Temp_tc^4)-(Temp_wall^4)))/alpha;
+end
